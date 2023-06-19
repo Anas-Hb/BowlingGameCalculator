@@ -44,7 +44,6 @@ const BowlingGameCalculator: React.FC = () => {
 
     updatedTurns[turnIndex] = [...updatedTurns[turnIndex], wedge];
     setTurns(updatedTurns);
-
     setRemainingWedges(remainingWedges - wedge);
 
     if (currentTurn < 10) {
@@ -57,18 +56,37 @@ const BowlingGameCalculator: React.FC = () => {
       }
     } else if (currentTurn === 10 && currentBall === 1) {
       if (wedge === 10) {
-        setCurrentBall(2);
         setRemainingWedges(10);
       } else {
-        setCurrentBall(2);
         setRemainingWedges(10 - wedge);
       }
+      setCurrentBall(2);
     } else if (currentTurn === 10 && currentBall === 2) {
-      setCurrentBall(3);
-      setRemainingWedges(10);
+      if (remainingWedges === wedge) {
+        setCurrentBall(3);
+        setRemainingWedges(10);
+      } else {
+        handleGameFinished(totalScore + wedge);
+      }
+    } else if (currentTurn === 10 && currentBall === 3) {
+      handleGameFinished(totalScore + wedge);
     }
   };
-
+  const handleGameFinished = (scour: number) => {
+    const result = window.confirm(
+      "The game is finish! \nYour scour : " +
+        scour +
+        "\n Press OK to reset the game!"
+    );
+    if (result) {
+      setTurns(Array.from({ length: 10 }, () => []));
+      setCurrentTurn(1);
+      setCurrentBall(1);
+      setRemainingWedges(10);
+    } else {
+      console.log("Canceled without reset");
+    }
+  };
   return (
     <div>
       <h1>Bowling Game Calculator</h1>
@@ -86,7 +104,12 @@ const BowlingGameCalculator: React.FC = () => {
       </div>
       <div className="container">
         {turns.map((turn, index) => (
-          <Turn key={index} turnIndex={index} turn={turn} />
+          <Turn
+            key={index}
+            turnIndex={index}
+            turn={turn}
+            currentTurn={currentTurn}
+          />
         ))}
       </div>
       <div className="info">
